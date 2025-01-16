@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Real-Time Temperature</title>
+  </head>
+  <body>
+    <h1>Real-Time Temperature Data</h1>
+
+    <!-- Menampilkan suhu terbaru dan waktu respons -->
+    <p id="latest-temperature">Latest Temperature:</p>
+
+    <!-- Riwayat data suhu -->
+    <ul id="temperature-history">
+      <!-- Riwayat suhu dan respons akan ditambahkan di sini -->
+    </ul>
+
+    <script>
+      const eventSource = new EventSource("/events");
+
+      eventSource.onmessage = function (event) {
+        const data = JSON.parse(event.data);
+        const latestTemperatureElement =
+          document.getElementById("latest-temperature");
+        const temperatureHistoryElement = document.getElementById(
+          "temperature-history"
+        );
+
+        // Menampilkan suhu terbaru dan waktu respons
+        latestTemperatureElement.textContent = `Latest Temperature: ${data.temperature} | Response Time: ${data.responseTime}`;
+
+        // Menambahkan data ke riwayat
+        const newListItem = document.createElement("li");
+        newListItem.textContent = `Temperature: ${data.temperature} | Response Time: ${data.responseTime} | Timestamp: ${data.timestamp}`;
+        temperatureHistoryElement.appendChild(newListItem);
+      };
+
+      eventSource.onerror = function () {
+        document.getElementById("latest-temperature").textContent =
+          "Connection lost, trying to reconnect...";
+      };
+    </script>
+  </body>
+</html>
